@@ -3,22 +3,22 @@
 export const canvasHeight = window.innerHeight;
 const canvasWidth = window.innerWidth;
 
-
 const input = "X";
+
 const rules: any = {
-  "X": "+YF-XFX-FY+",
-  "Y": "-XF+YFY+FX-"
+  X: "+YF-XFX-FY+",
+  Y: "-XF+YFY+FX-"
 };
+
 const alpha = 90;
-const iterations = 10;
-const r = 50
+const iterations = 5;
+const r = 20;
 
 // const input = "FFF-FF-F-F+F+FF-F-FFF";
 // const rules = { "X": "Y" };
 // const alpha = 90;
 // const iterations = 1;
 // const r = 30
-
 
 let output = input;
 
@@ -31,10 +31,6 @@ function solveSystem(input: any, rules: any) {
   const ruleKeys = Object.keys(rules);
 
   while (i < input.length && j < input.length) {
-    console.log(i, j);
-
-    j = i;
-
     while (
       ruleKeys.some(ruleKey => ruleKey.startsWith(input.slice(i, j + 1))) &&
       j < input.length
@@ -42,9 +38,17 @@ function solveSystem(input: any, rules: any) {
       j = j + 1;
     }
 
+    if (i === j) {
+      j++;
+    }
+
     const match = input.slice(i, j);
-    output += rules[match];
-    console.log(output);
+
+    if (rules[match]) {
+      output += rules[match];
+    } else {
+      output += match;
+    }
 
     i = j;
   }
@@ -56,11 +60,14 @@ for (let i = 0; i < iterations; i++) {
   output = solveSystem(output, rules);
 }
 
+console.log(output);
+
+console.log("RENDERING----------------------");
+
 const c = document.getElementsByTagName("canvas")[0];
 c.width = canvasWidth * 2;
 c.height = canvasHeight * 2;
 const ctx = c.getContext("2d");
-
 
 if (ctx) {
   // setup canvas
@@ -69,7 +76,7 @@ if (ctx) {
   ctx.fillRect(0, 0, c.width, c.height);
 
   // set start position and direction
-  let location = [canvasWidth / 2, canvasHeight / 2];
+  let location = [canvasWidth, canvasHeight];
   let direction = alpha;
 
   // set colors
@@ -91,11 +98,11 @@ if (ctx) {
         break;
       }
       case "F": {
-        const nextX = location[0] + (r * Math.cos(direction * Math.PI / 180));
-        const nextY = location[1] - (r * Math.sin(direction * Math.PI / 180));
+        const nextX = location[0] + r * Math.cos((direction * Math.PI) / 180);
+        const nextY = location[1] - r * Math.sin((direction * Math.PI) / 180);
         const nextLocation = [nextX, nextY];
 
-        console.log(nextLocation)
+        console.log(nextLocation);
 
         ctx.beginPath();
         ctx.moveTo(location[0], location[1]);
@@ -104,7 +111,7 @@ if (ctx) {
         ctx.stroke();
 
         currentColor = (currentColor + 1) % strokeStyles.length;
-        location = nextLocation
+        location = nextLocation;
         break;
       }
     }
