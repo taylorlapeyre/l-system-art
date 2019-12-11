@@ -71,38 +71,62 @@ const ctx = c.getContext("2d");
 
 if (ctx) {
   // setup canvas
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 1;
   ctx.fillStyle = "f4f4f4";
   ctx.fillRect(0, 0, c.width, c.height);
 
   // set start position and direction
-  let location = [canvasWidth, canvasHeight];
-  let direction = alpha;
+  let turtleState = {
+    location: [canvasWidth, canvasHeight],
+    direction: alpha,
+    currentColor: 0,
+    lineLength: r
+  }
+
+  let turtleStack = [];
 
   // set colors
   const strokeStyles = ["ffac8e", "fd7792", "3f4d71", "55ae95"];
-  let currentColor = 0;
 
-  ctx.moveTo(location[0], location[1]);
+  ctx.moveTo(turtleState.location[0], turtleState.location[1]);
 
   for (const instruction of output.split("")) {
-    console.log(instruction);
-
     switch (instruction) {
+      case ">": {
+        turtleState.lineLength = turtleState.lineLength * scaleFactor
+        break;
+      }
+      case "<": {
+        turtleState.lineLength = turtleState.lineLength / scaleFactor
+        break;
+      }
+      case "[": {
+        turtleStack.push({ ...turtleState });
+        console.log("Storing.", turtleStack)
+        break;
+      }
+      case "]": {
+        let nextTurtleState = turtleStack.pop();
+
+        if (nextTurtleState) {
+          console.log("GOING TO", nextTurtleState)
+          turtleState = nextTurtleState;
+        }
+        break;
+      }
       case "+": {
-        direction = direction + alpha;
+        turtleState.direction = turtleState.direction + alpha;
         break;
       }
       case "-": {
-        direction = direction - alpha;
+        turtleState.direction = turtleState.direction - alpha;
         break;
       }
       case "F": {
-        const nextX = location[0] + r * Math.cos((direction * Math.PI) / 180);
-        const nextY = location[1] - r * Math.sin((direction * Math.PI) / 180);
+        const { location, direction, currentColor, lineLength } = turtleState;
+        const nextX = location[0] + lineLength * Math.cos((direction * Math.PI) / 180);
+        const nextY = location[1] - lineLength * Math.sin((direction * Math.PI) / 180);
         const nextLocation = [nextX, nextY];
-
-        console.log(nextLocation);
 
         ctx.beginPath();
         ctx.moveTo(location[0], location[1]);
@@ -110,8 +134,8 @@ if (ctx) {
         ctx.strokeStyle = strokeStyles[currentColor];
         ctx.stroke();
 
-        currentColor = (currentColor + 1) % strokeStyles.length;
-        location = nextLocation;
+        turtleState.currentColor = (currentColor + 1) % strokeStyles.length;
+        turtleState.location = nextLocation;
         break;
       }
     }
