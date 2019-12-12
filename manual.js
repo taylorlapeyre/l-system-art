@@ -46,3 +46,12 @@ const rules = {
     "F+F-F"
   ],
 }
+
+// Hexagons
+const iterations = 5;
+const lineLength = 70;
+const angle = 60;
+const axiom = "F+F+F+F+F+F";
+const rules = {
+  "F": "F-F+F+F+F+F"
+}
