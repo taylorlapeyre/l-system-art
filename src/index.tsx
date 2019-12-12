@@ -1,4 +1,4 @@
-export function solveSystem(input: any, rules: any) {
+export function solveSystem(axiom: string, rules: any) {
   let output = "";
 
   let i = 0;
@@ -6,10 +6,10 @@ export function solveSystem(input: any, rules: any) {
 
   const ruleKeys = Object.keys(rules);
 
-  while (i < input.length && j < input.length) {
+  while (i < axiom.length && j < axiom.length) {
     while (
-      ruleKeys.some(ruleKey => ruleKey.startsWith(input.slice(i, j + 1))) &&
-      j < input.length
+      ruleKeys.some(ruleKey => ruleKey.startsWith(axiom.slice(i, j + 1))) &&
+      j < axiom.length
     ) {
       j = j + 1;
     }
@@ -18,7 +18,7 @@ export function solveSystem(input: any, rules: any) {
       j++;
     }
 
-    const match = input.slice(i, j);
+    const match = axiom.slice(i, j);
 
     if (rules[match]) {
       output += rules[match];
@@ -123,7 +123,12 @@ let instructions = axiom;
 for (let i = 0; i < iterations; i++) {
   instructions = solveSystem(instructions, rules);
 }
-document.body.appendChild(document.createTextNode(instructions));
+
+const code = document.createElement("pre")
+code.width = window.innerWidth;
+code.style.wordWrap = "break-word"
+code.appendChild(document.createTextNode(instructions));
+document.body.appendChild(code);
 
 const windowHeight = window.innerHeight;
 const windowWidth = window.innerWidth;
