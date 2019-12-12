@@ -22,8 +22,6 @@ const r = 20;
 // const iterations = 1;
 // const r = 30
 
-let output = input;
-
 function solveSystem(input: any, rules: any) {
   let output = "";
 
