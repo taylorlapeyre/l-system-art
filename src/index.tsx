@@ -1,7 +1,3 @@
-// ReactDOM.render(<App />, document.getElementById('root'));
-
-const scaleFactor = 1.5;
-
 export function solveSystem(input: any, rules: any) {
   let output = "";
 
@@ -36,45 +32,27 @@ export function solveSystem(input: any, rules: any) {
   return output;
 }
 
-const axiom = "X";
-const alpha = 90;
-const iterations = 5;
-const r = 20;
-const rules: any = {
-  X: "+YF-XFX-FY+",
-  Y: "-XF+YFY+FX-"
-};
 
-let output = axiom;
-for (let i = 0; i < iterations; i++) {
-  output = solveSystem(output, rules);
+interface TurtleState {
+  location: [number, number],
+  direction: number,
+  currentColor: number,
+  lineLength: number,
+  lineScaleFactor: number
 }
-console.log("Rendering: ", output);
 
-
-
-
-const windowHeight = window.innerHeight;
-const windowWidth = window.innerWidth;
-const c = document.getElementsByTagName("canvas")[0];
-c.width = windowWidth * 2;
-c.height = windowHeight * 2;
-const ctx = c.getContext("2d");
-
-if (ctx) {
+function renderInstructionsToCanvas(
+  instructions: string,
+  ctx: CanvasRenderingContext2D,
+  initialState: TurtleState
+) {
   // setup canvas
   ctx.lineWidth = 4;
   ctx.fillStyle = "f4f4f4";
   ctx.fillRect(0, 0, c.width, c.height);
 
   // set start position and direction
-  let turtleState = {
-    location: [windowWidth, windowHeight],
-    direction: alpha,
-    currentColor: 0,
-    lineLength: r
-  }
-
+  let turtleState = initialState;
   let turtleStack = [];
 
   // set colors
@@ -82,14 +60,14 @@ if (ctx) {
 
   ctx.moveTo(turtleState.location[0], turtleState.location[1]);
 
-  for (const instruction of output) {
+  for (const instruction of instructions) {
     switch (instruction) {
       case ">": {
-        turtleState.lineLength = turtleState.lineLength * scaleFactor
+        turtleState.lineLength = turtleState.lineLength * turtleState.lineScaleFactor
         break;
       }
       case "<": {
-        turtleState.lineLength = turtleState.lineLength / scaleFactor
+        turtleState.lineLength = turtleState.lineLength / turtleState.lineScaleFactor
         break;
       }
       case "[": {
@@ -116,7 +94,7 @@ if (ctx) {
         const { location, direction, currentColor, lineLength } = turtleState;
         const nextX = location[0] + lineLength * Math.cos((direction * Math.PI) / 180);
         const nextY = location[1] - lineLength * Math.sin((direction * Math.PI) / 180);
-        const nextLocation = [nextX, nextY];
+        const nextLocation: [number, number] = [nextX, nextY];
 
         ctx.beginPath();
         ctx.moveTo(location[0], location[1]);
@@ -130,6 +108,36 @@ if (ctx) {
       }
     }
   }
+}
 
-  ctx.stroke();
+const axiom = "X";
+const alpha = 90;
+const iterations = 5;
+const r = 20;
+const rules: any = {
+  X: "+YF-XFX-FY+",
+  Y: "-XF+YFY+FX-"
+};
+
+let instructions = axiom;
+for (let i = 0; i < iterations; i++) {
+  instructions = solveSystem(instructions, rules);
+}
+document.body.appendChild(document.createTextNode(instructions));
+
+const windowHeight = window.innerHeight;
+const windowWidth = window.innerWidth;
+const c = document.getElementsByTagName("canvas")[0];
+c.width = windowWidth * 2;
+c.height = windowHeight * 2;
+const ctx = c.getContext("2d");
+
+if (ctx) {
+  renderInstructionsToCanvas(instructions, ctx, {
+    location: [windowWidth, windowHeight],
+    direction: alpha,
+    currentColor: 0,
+    lineLength: r,
+    lineScaleFactor: 1.2
+  })
 }
