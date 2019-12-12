@@ -4,11 +4,11 @@ export function solveSystem(axiom: string, rules: any) {
   let i = 0;
   let j = 0;
 
-  const ruleKeys = Object.keys(rules);
+  const contexts = Object.keys(rules)
 
   while (i < axiom.length && j < axiom.length) {
     while (
-      ruleKeys.some(ruleKey => ruleKey.startsWith(axiom.slice(i, j + 1))) &&
+      contexts.some(context => context.startsWith(axiom.slice(i, j + 1))) &&
       j < axiom.length
     ) {
       j = j + 1;
@@ -19,11 +19,15 @@ export function solveSystem(axiom: string, rules: any) {
     }
 
     const match = axiom.slice(i, j);
+    const production = rules[match]
 
-    if (rules[match]) {
-      output += rules[match];
+    if (Array.isArray(production)) {
+      const randomIndex = Math.floor(production.length * Math.random());
+      output += production[randomIndex]
+    } else if (production) {
+      output += production
     } else {
-      output += match;
+      output += match
     }
 
     i = j;
@@ -83,11 +87,11 @@ function renderInstructionsToCanvas(
         break;
       }
       case "+": {
-        turtleState.direction = turtleState.direction + alpha;
+        turtleState.direction = turtleState.direction + angle;
         break;
       }
       case "-": {
-        turtleState.direction = turtleState.direction - alpha;
+        turtleState.direction = turtleState.direction - angle;
         break;
       }
       case "F": {
@@ -110,14 +114,16 @@ function renderInstructionsToCanvas(
   }
 }
 
-const axiom = "X";
-const alpha = 90;
 const iterations = 5;
-const r = 20;
-const rules: any = {
-  X: "+YF-XFX-FY+",
-  Y: "-XF+YFY+FX-"
-};
+const lineLength = 70;
+const angle = 120;
+const axiom = "F+F+F";
+const rules = {
+  "F": [
+    "F-F+F",
+    "F+F-F"
+  ],
+}
 
 let instructions = axiom;
 for (let i = 0; i < iterations; i++) {
@@ -140,9 +146,9 @@ const ctx = c.getContext("2d");
 if (ctx) {
   renderInstructionsToCanvas(instructions, ctx, {
     location: [windowWidth, windowHeight],
-    direction: alpha,
+    direction: angle,
     currentColor: 0,
-    lineLength: r,
+    lineLength: lineLength,
     lineScaleFactor: 1.2
   })
 }
