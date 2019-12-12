@@ -3,7 +3,9 @@
 export const canvasHeight = window.innerHeight;
 const canvasWidth = window.innerWidth;
 
-const input = "X";
+const axiom = "FX";
+
+const scaleFactor = 1.5;
 
 const rules: any = {
   X: "+YF-XFX-FY+",
@@ -55,6 +57,8 @@ function solveSystem(input: any, rules: any) {
 
   return output;
 }
+
+let output = axiom;
 
 for (let i = 0; i < iterations; i++) {
   output = solveSystem(output, rules);
